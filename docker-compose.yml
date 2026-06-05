@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  misaki:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./misaki.yaml:/app/misaki.yaml
+    environment:
+      - MISAKI_CONFIG=/app/misaki.yaml
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped

@@ -1,0 +1,46 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+
+providers:
+  openai:
+    type: openai
+    api_key_env: OPENAI_API_KEY
+
+  openai_mock:
+    type: mock
+    api_key_env: None
+
+  local_vllm:
+    type: openai_compatible
+    base_url: http://localhost:8000/v1
+    api_key_env: LOCAL_VLLM_API_KEY
+
+models:
+  cheap-extract:
+    provider: local_vllm
+    model: qwen2.5-7b-instruct
+
+  reliable-extract:
+    provider: openai
+    model: gpt-4o-mini
+
+  strongest:
+    provider: openai
+    model: gpt-4o
+
+policies:
+  cheap-then-strong:
+    strategy: cascade
+    steps:
+      - model: cheap-extract
+        accept_if:
+          schema_valid: true
+          confidence_gte: 0.92
+      - model: reliable-extract
+        accept_if:
+          schema_valid: true
+          confidence_gte: 0.96
+      - model: strongest
+    max_cost_usd: 0.02
+    max_attempts: 3
