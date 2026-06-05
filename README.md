@@ -13,8 +13,8 @@ Large Language Models (LLMs) operate on **probability**. They do not compile sch
 1. **Syntactic Failures (JSON Malformation):** LLMs frequently drop closing braces `}`, emit trailing commas, or embed markdown block ticks (e.g., ` ```json `) inside their raw output, causing standard JSON parsers to crash.
 2. **Semantic Schema Drift:** Even if the output is valid JSON, LLMs often omit required keys, assign wrong data types (e.g., a string instead of a float for price), or return unrequested fields.
 3. **The Efficiency Dilemma (Cost vs. Latency vs. Accuracy):** 
-   * Strong models (e.g., GPT-4o, Claude 3.5 Sonnet) excel at structured output but are expensive and introduce higher latency.
-   * Cheap models (e.g., GPT-4o-mini, Gemini Flash) are fast and cheap but frequently fail complex schema validation.
+   * Strong models (e.g., GPT-5.5, Claude 4.8 Opus) excel at structured output but are expensive and introduce higher latency.
+   * Cheap models (e.g., GPT-4o-mini, Gemini 2.5 Flash) are fast and cheap but frequently fail complex schema validation.
 4. **Network and Provider Instability:** Relying on a single model or provider makes applications highly vulnerable to rate limits, timeouts, and outages.
 
 ---
@@ -66,7 +66,7 @@ graph TD
 ## 4. Key Features
 
 * **OpenAI-Compatible Proxy:** Drop-in proxy replacement supporting standard header authentication and OpenAI SDK payloads.
-* **Cascades & Fallbacks:** Configure step-by-step routing cascades (e.g., `llama-3` ➔ `gpt-4o-mini` ➔ `claude-3-5-sonnet`) with automatic escalation on validation failure.
+* **Cascades & Fallbacks:** Configure step-by-step routing cascades (e.g., `gpt-4o-mini` ➔ `claude-4.8-opus`) with automatic escalation on validation failure.
 * **Local Self-Repair Loops:** Feeds raw compilation errors back to the generator to correct malformed structures, saving cost by preventing immediate fallback escalation.
 * **Blended Confidence Scoring:** Integrates token-level logprobs ($e^{\text{logprob}}$) with repair-stability heuristics to assign a confidence percentage to each extracted field.
 * **Incremental Streaming Parser:** Parses and reconstructs incomplete JSON tokens during streaming (SSE), triggering **early aborts** the moment a schema type-mismatch is structurally determined.
@@ -97,9 +97,9 @@ models:
   gpt-mini:
     provider: "openai"
     model: "gpt-4o-mini"
-  claude-sonnet:
+  claude-opus:
     provider: "anthropic"
-    model: "claude-3-5-sonnet-20241022"
+    model: "claude-4-8-opus"
 
 policies:
   invoice-extraction:
@@ -110,7 +110,7 @@ policies:
         accept_if:
           schema_valid: true
           confidence_gte: 0.90
-      - model: "claude-sonnet"
+      - model: "claude-opus"
         timeout_ms: 8000
         accept_if:
           schema_valid: true
