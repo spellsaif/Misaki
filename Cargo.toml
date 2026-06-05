@@ -1,0 +1,6 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/misaki-core",
+    "crates/misaki-proxy",
+]
